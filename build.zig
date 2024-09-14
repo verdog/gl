@@ -27,6 +27,22 @@ pub fn build(b: *std.Build) void {
     });
     exe.root_module.addImport("gl", gl_bindings);
 
+    const stb_dep = b.dependency("stb", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    const stb = b.addTranslateC(.{
+        .root_source_file = stb_dep.path("stb_image.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.addCSourceFile(.{ .file = b.path("src/stb_image_impl.c"), .flags = &.{
+        "-O2",
+        "-I",
+        stb_dep.path(".").getPath3(b, &stb.step).root_dir.path.?,
+    } });
+    exe.root_module.addImport("stbimg", stb.createModule());
+
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| {

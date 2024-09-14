@@ -31,6 +31,10 @@
             .url = "https://github.com/castholm/zigglgen/releases/download/v0.2.3/zigglgen.tar.gz",
             .hash = "1220f4188a5e1bdbb15fd50e9ea322c0721384eeba9bc077e4179b0b0eeaa7fe4ad9",
         },
+        .stb = .{
+            .url = "https://codeload.github.com/nothings/stb/zip/refs/heads/master",
+            .hash = "1220c4fe5a4c4ebec402f5cdef08bc264b56fb07f259107d2b01ba8d416d88624b50",
+        },
     },
     .paths = .{
         "build.zig",

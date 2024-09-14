@@ -4,7 +4,7 @@ pub fn activate(self: Shader) void {
     gl.UseProgram(self.id);
 }
 
-pub fn set(self: Shader, T: type, name: []const u8, value: T) !void {
+pub fn set(self: Shader, T: type, name: [*:0]const u8, value: T) !void {
     const loc = gl.GetUniformLocation(self.id, name);
     if (loc == -1) return error.UniformNotFound;
 
