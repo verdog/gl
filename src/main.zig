@@ -9,9 +9,22 @@ fn framebufferSizeCallback(_: glfw.Window, width: u32, height: u32) void {
 
 var gl_procs: gl.ProcTable = undefined;
 
+var polygons = false;
+var polygons_up = true;
+
 fn processInput(window: glfw.Window) void {
     if (window.getKey(.escape) == .press) {
         window.setShouldClose(true);
+    }
+
+    if (window.getKey(.z) == .press) {
+        if (polygons_up) {
+            polygons = !polygons;
+            polygons_up = false;
+            gl.PolygonMode(gl.FRONT_AND_BACK, if (polygons) gl.LINE else gl.FILL);
+        }
+    } else {
+        polygons_up = true;
     }
 }
 
@@ -150,8 +163,6 @@ pub fn main() !void {
 
         break :blk id;
     };
-
-    // gl.PolygonMode(gl.FRONT_AND_BACK, gl.LINE);
 
     // Wait for the user to close the window.
     while (!window.shouldClose()) {
