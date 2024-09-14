@@ -43,6 +43,12 @@ pub fn build(b: *std.Build) void {
     } });
     exe.root_module.addImport("stbimg", stb.createModule());
 
+    const glm_dep = b.dependency("glm-zig", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.root_module.addImport("glm", glm_dep.module("glm"));
+
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| {
@@ -57,6 +63,10 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    exe_unit_tests.root_module.addImport("glfw", glfw_dep.module("mach-glfw"));
+    exe_unit_tests.root_module.addImport("gl", gl_bindings);
+    exe_unit_tests.root_module.addImport("stbimg", stb.createModule());
+    exe_unit_tests.root_module.addImport("glm", glm_dep.module("glm"));
 
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
 
