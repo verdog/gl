@@ -29,8 +29,8 @@
         .zigglgen = .{
             .path = "./libs/zigglgen/zigglgen",
         },
-        .@"glm-zig" = .{
-            .path = "./libs/glm-zig",
+        .@"cglm" = .{
+            .path = "./libs/cglm",
         },
         .stb = .{
             .url = "https://codeload.github.com/nothings/stb/zip/refs/heads/master",

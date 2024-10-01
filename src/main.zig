@@ -142,6 +142,12 @@ pub fn main() !void {
     try shader.set(i32, "tex0", 0);
     try shader.set(i32, "tex1", 1);
 
+    var vec = zglm.Vec4.init4(1, 0, 0, 1);
+    var trans = zglm.Mat4.init();
+    trans.translateBy(zglm.Vec3.init3(1, 1, 0));
+    vec = trans.applyTo(vec);
+    std.debug.print("done: {any}\n", .{vec.vec4});
+
     // Wait for the user to close the window.
     while (!window.shouldClose()) {
         processInput(window);
@@ -164,6 +170,7 @@ pub fn main() !void {
 const Shader = @import("Shader.zig");
 
 const gl = @import("gl");
+const zglm = @import("zglm.zig");
 const glfw = @import("glfw");
 const std = @import("std");
 const stbimg = @import("stbimg");

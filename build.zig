@@ -43,11 +43,67 @@ pub fn build(b: *std.Build) void {
     } });
     exe.root_module.addImport("stbimg", stb.createModule());
 
-    const glm_dep = b.dependency("glm-zig", .{
+    const glm_dep = b.dependency("cglm", .{
         .target = target,
         .optimize = optimize,
     });
-    exe.root_module.addImport("glm", glm_dep.module("glm"));
+    const glm = b.addTranslateC(.{
+        .root_source_file = glm_dep.path("./include/cglm/call.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.root_module.addImport("glm", glm.createModule());
+
+    exe.addCSourceFiles(.{
+        .root = glm_dep.path("."),
+        .files = &[_][]const u8{
+            "src/euler.c",
+            "src/affine.c",
+            "src/io.c",
+            "src/quat.c",
+            "src/cam.c",
+            "src/vec2.c",
+            "src/ivec2.c",
+            "src/vec3.c",
+            "src/ivec3.c",
+            "src/vec4.c",
+            "src/ivec4.c",
+            "src/mat2.c",
+            "src/mat2x3.c",
+            "src/mat2x4.c",
+            "src/mat3.c",
+            "src/mat3x2.c",
+            "src/mat3x4.c",
+            "src/mat4.c",
+            "src/mat4x2.c",
+            "src/mat4x3.c",
+            "src/plane.c",
+            "src/frustum.c",
+            "src/box.c",
+            "src/project.c",
+            "src/sphere.c",
+            "src/ease.c",
+            "src/curve.c",
+            "src/bezier.c",
+            "src/ray.c",
+            "src/affine2d.c",
+            "src/clipspace/ortho_lh_no.c",
+            "src/clipspace/ortho_lh_zo.c",
+            "src/clipspace/ortho_rh_no.c",
+            "src/clipspace/ortho_rh_zo.c",
+            "src/clipspace/persp_lh_no.c",
+            "src/clipspace/persp_lh_zo.c",
+            "src/clipspace/persp_rh_no.c",
+            "src/clipspace/persp_rh_zo.c",
+            "src/clipspace/view_lh_no.c",
+            "src/clipspace/view_lh_zo.c",
+            "src/clipspace/view_rh_no.c",
+            "src/clipspace/view_rh_zo.c",
+            "src/clipspace/project_no.c",
+            "src/clipspace/project_zo.c",
+        },
+        .flags = &.{"-O2"},
+    });
 
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
@@ -66,7 +122,7 @@ pub fn build(b: *std.Build) void {
     exe_unit_tests.root_module.addImport("glfw", glfw_dep.module("mach-glfw"));
     exe_unit_tests.root_module.addImport("gl", gl_bindings);
     exe_unit_tests.root_module.addImport("stbimg", stb.createModule());
-    exe_unit_tests.root_module.addImport("glm", glm_dep.module("glm"));
+    exe_unit_tests.root_module.addImport("glm", glm.createModule());
 
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
 
