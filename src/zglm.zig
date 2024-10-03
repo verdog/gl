@@ -55,8 +55,16 @@ pub const Mat4 = struct {
         return r;
     }
 
-    pub fn translateBy(self: *Mat4, vec3: Vec3) void {
-        glm.glmc_translate(&self.mat4, @constCast(&vec3.vec3));
+    pub fn scaleBy(self: *Mat4, vec: Vec3) void {
+        glm.glmc_scale(&self.mat4, @constCast(&vec.vec3));
+    }
+
+    pub fn translateBy(self: *Mat4, vec: Vec3) void {
+        glm.glmc_translate(&self.mat4, @constCast(&vec.vec3));
+    }
+
+    pub fn rotateBy(self: *Mat4, radians: f32, axis: Vec3) void {
+        glm.glmc_rotate(&self.mat4, radians, @constCast(&axis.vec3));
     }
 
     pub fn applyTo(self: Mat4, to: anytype) @TypeOf(to) {

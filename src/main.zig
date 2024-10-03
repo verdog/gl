@@ -142,17 +142,18 @@ pub fn main() !void {
     try shader.set(i32, "tex0", 0);
     try shader.set(i32, "tex1", 1);
 
-    var vec = zglm.Vec4.init4(1, 0, 0, 1);
-    var trans = zglm.Mat4.init();
-    trans.translateBy(zglm.Vec3.init3(1, 1, 0));
-    vec = trans.applyTo(vec);
-    std.debug.print("done: {any}\n", .{vec.vec4});
-
     // Wait for the user to close the window.
     while (!window.shouldClose()) {
         processInput(window);
 
         gl.Clear(gl.COLOR_BUFFER_BIT);
+
+        var trans = zglm.Mat4.init();
+        trans.translateBy(zglm.Vec3.init3(0.5, -0.5, 0.0));
+        trans.rotateBy(@floatCast(glfw.getTime()), zglm.Vec3.init3(0, 0, 1));
+
+        const transform_loc = gl.GetUniformLocation(shader.id, "transform");
+        gl.UniformMatrix4fv(transform_loc, 1, gl.FALSE, @ptrCast(&trans.mat4));
 
         shader.activate();
         gl.ActiveTexture(gl.TEXTURE0);
