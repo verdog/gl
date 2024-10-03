@@ -148,12 +148,12 @@ pub fn main() !void {
 
         gl.Clear(gl.COLOR_BUFFER_BIT);
 
-        var trans = zglm.Mat4.init();
-        trans.translateBy(zglm.Vec3.init3(0.5, -0.5, 0.0));
-        trans.rotateBy(@floatCast(glfw.getTime()), zglm.Vec3.init3(0, 0, 1));
+        const trans = zm.Mat4f.translation(0.5, -0.5, 0.0);
+        const rot = zm.Mat4f.rotation(.{ 0, 0, 1 }, @floatCast(glfw.getTime()));
+        const tform = trans.multiply(rot);
 
         const transform_loc = gl.GetUniformLocation(shader.id, "transform");
-        gl.UniformMatrix4fv(transform_loc, 1, gl.FALSE, @ptrCast(&trans.mat4));
+        gl.UniformMatrix4fv(transform_loc, 1, gl.TRUE, @ptrCast(&tform));
 
         shader.activate();
         gl.ActiveTexture(gl.TEXTURE0);
@@ -171,7 +171,7 @@ pub fn main() !void {
 const Shader = @import("Shader.zig");
 
 const gl = @import("gl");
-const zglm = @import("zglm.zig");
+const zm = @import("zm");
 const glfw = @import("glfw");
 const std = @import("std");
 const stbimg = @import("stbimg");
