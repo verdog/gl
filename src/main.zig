@@ -150,10 +150,10 @@ pub fn main() !void {
 
         const trans = za.Mat4.fromTranslate(za.Vec3.new(0.5, -0.5, 0));
         const rot = za.Mat4.fromRotation(za.toDegrees(@as(f32, @floatCast(glfw.getTime()))), za.Vec3.new(0, 0, 1));
-        const tform = trans.mul(rot).transpose();
+        const tform = trans.mul(rot);
 
         const transform_loc = gl.GetUniformLocation(shader.id, "transform");
-        gl.UniformMatrix4fv(transform_loc, 1, gl.TRUE, @ptrCast(&tform));
+        gl.UniformMatrix4fv(transform_loc, 1, gl.FALSE, @ptrCast(&tform));
 
         shader.activate();
         gl.ActiveTexture(gl.TEXTURE0);
