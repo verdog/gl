@@ -148,9 +148,9 @@ pub fn main() !void {
 
         gl.Clear(gl.COLOR_BUFFER_BIT);
 
-        const trans = zm.Mat4f.translation(0.5, -0.5, 0.0);
-        const rot = zm.Mat4f.rotation(.{ 0, 0, 1 }, @floatCast(glfw.getTime()));
-        const tform = trans.multiply(rot);
+        const trans = za.Mat4.fromTranslate(za.Vec3.new(0.5, -0.5, 0));
+        const rot = za.Mat4.fromRotation(@floatCast(glfw.getTime() * 180.0 / std.math.pi), za.Vec3.new(0, 0, 1));
+        const tform = trans.mul(rot).transpose();
 
         const transform_loc = gl.GetUniformLocation(shader.id, "transform");
         gl.UniformMatrix4fv(transform_loc, 1, gl.TRUE, @ptrCast(&tform));
@@ -171,7 +171,7 @@ pub fn main() !void {
 const Shader = @import("Shader.zig");
 
 const gl = @import("gl");
-const zm = @import("zm");
+const za = @import("za");
 const glfw = @import("glfw");
 const std = @import("std");
 const stbimg = @import("stbimg");

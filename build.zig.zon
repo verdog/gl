@@ -36,10 +36,9 @@
             .url = "https://codeload.github.com/nothings/stb/zip/refs/heads/master",
             .hash = "1220c4fe5a4c4ebec402f5cdef08bc264b56fb07f259107d2b01ba8d416d88624b50",
         },
-        .zm = .{
-            .url = "git+https://github.com/griush/zm#24eb73d78b73322efbe84f0ccd5a23debc174920",
-            .hash = "1220fca42cac0931a1a6af2ca0159b53c1c865a3746c5326d1f59cd9f78c495517e2",
-        },
+        .zalgebra = .{
+            .path = "./libs/zalgebra",
+        }
     },
     .paths = .{
         "build.zig",

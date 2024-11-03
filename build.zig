@@ -43,8 +43,8 @@ pub fn build(b: *std.Build) void {
     } });
     exe.root_module.addImport("stbimg", stb.createModule());
 
-    const zm = b.dependency("zm", .{});
-    exe.root_module.addImport("zm", zm.module("zm"));
+    const za = b.dependency("zalgebra", .{});
+    exe.root_module.addImport("za", za.module("zalgebra"));
 
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
@@ -63,7 +63,7 @@ pub fn build(b: *std.Build) void {
     exe_unit_tests.root_module.addImport("glfw", glfw_dep.module("mach-glfw"));
     exe_unit_tests.root_module.addImport("gl", gl_bindings);
     exe_unit_tests.root_module.addImport("stbimg", stb.createModule());
-    exe_unit_tests.root_module.addImport("zm", zm.module("zm"));
+    exe_unit_tests.root_module.addImport("za", za.module("zalgebra"));
 
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
 
