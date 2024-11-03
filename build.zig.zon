@@ -24,20 +24,20 @@
     // internet connectivity.
     .dependencies = .{
         .@"mach-glfw" = .{
-            .path = "./libs/mach-glfw",
+            .path = "./vendored/mach-glfw",
         },
         .zigglgen = .{
-            .path = "./libs/zigglgen/zigglgen",
+            .path = "./vendored/zigglgen/zigglgen",
         },
         .cglm = .{
-            .path = "./libs/cglm",
+            .path = "./vendored/cglm",
         },
         .stb = .{
             .url = "https://codeload.github.com/nothings/stb/zip/refs/heads/master",
             .hash = "1220c4fe5a4c4ebec402f5cdef08bc264b56fb07f259107d2b01ba8d416d88624b50",
         },
         .zalgebra = .{
-            .path = "./libs/zalgebra",
+            .path = "./vendored/zalgebra",
         }
     },
     .paths = .{
