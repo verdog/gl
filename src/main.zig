@@ -149,7 +149,7 @@ pub fn main() !void {
         gl.Clear(gl.COLOR_BUFFER_BIT);
 
         const trans = za.Mat4.fromTranslate(za.Vec3.new(0.5, -0.5, 0));
-        const rot = za.Mat4.fromRotation(@floatCast(glfw.getTime() * 180.0 / std.math.pi), za.Vec3.new(0, 0, 1));
+        const rot = za.Mat4.fromRotation(za.toDegrees(@as(f32, @floatCast(glfw.getTime()))), za.Vec3.new(0, 0, 1));
         const tform = trans.mul(rot).transpose();
 
         const transform_loc = gl.GetUniformLocation(shader.id, "transform");
