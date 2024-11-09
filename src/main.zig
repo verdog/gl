@@ -148,12 +148,23 @@ pub fn main() !void {
 
         gl.Clear(gl.COLOR_BUFFER_BIT);
 
-        const trans = za.Mat4.fromTranslate(za.Vec3.new(0.5, -0.5, 0));
-        const rot = za.Mat4.fromRotation(za.toDegrees(@as(f32, @floatCast(glfw.getTime()))), za.Vec3.new(0, 0, 1));
-        const tform = trans.mul(rot);
+        const model = za.Mat4.fromRotation(-55, za.Vec3.new(1.0, 0.0, 0.0));
+        // const model = za.Mat4.identity();
 
-        const transform_loc = gl.GetUniformLocation(shader.id, "transform");
-        gl.UniformMatrix4fv(transform_loc, 1, gl.FALSE, @ptrCast(&tform));
+        const view = za.Mat4.fromTranslate(za.Vec3.new(0, 0, -3));
+        // const view = za.Mat4.identity();
+
+        const proj = za.Mat4.perspective(45, 800.0 / 600.0, 0.1, 100.0);
+        // const proj = za.Mat4.identity();
+
+        const model_loc = gl.GetUniformLocation(shader.id, "model");
+        gl.UniformMatrix4fv(model_loc, 1, gl.FALSE, @ptrCast(&model.data));
+
+        const view_loc = gl.GetUniformLocation(shader.id, "view");
+        gl.UniformMatrix4fv(view_loc, 1, gl.FALSE, @ptrCast(&view.data));
+
+        const proj_loc = gl.GetUniformLocation(shader.id, "proj");
+        gl.UniformMatrix4fv(proj_loc, 1, gl.FALSE, @ptrCast(&proj.data));
 
         shader.activate();
         gl.ActiveTexture(gl.TEXTURE0);
