@@ -29,16 +29,50 @@ fn processInput(window: glfw.Window) void {
 }
 
 const vertices = [_]f32{
-    // positions          // colors           // texture coords
-    0.5, 0.5, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, // top right
-    0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, // bottom right
-    -0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, // bottom left
-    -0.5, 0.5, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, // top left
-};
+    // zig fmt: off
+    // x    y      z      u     v
+    -0.5 , -0.5 , -0.5 ,  0.0 , 0.0,
+     0.5 , -0.5 , -0.5 ,  1.0 , 0.0,
+     0.5 ,  0.5 , -0.5 ,  1.0 , 1.0,
+     0.5 ,  0.5 , -0.5 ,  1.0 , 1.0,
+    -0.5 ,  0.5 , -0.5 ,  0.0 , 1.0,
+    -0.5 , -0.5 , -0.5 ,  0.0 , 0.0,
 
-const indices = [_]u32{
-    0, 1, 3,
-    1, 2, 3,
+    -0.5 , -0.5 ,  0.5 ,  0.0 , 0.0,
+     0.5 , -0.5 ,  0.5 ,  1.0 , 0.0,
+     0.5 ,  0.5 ,  0.5 ,  1.0 , 1.0,
+     0.5 ,  0.5 ,  0.5 ,  1.0 , 1.0,
+    -0.5 ,  0.5 ,  0.5 ,  0.0 , 1.0,
+    -0.5 , -0.5 ,  0.5 ,  0.0 , 0.0,
+
+    -0.5 ,  0.5 ,  0.5 ,  1.0 , 0.0,
+    -0.5 ,  0.5 , -0.5 ,  1.0 , 1.0,
+    -0.5 , -0.5 , -0.5 ,  0.0 , 1.0,
+    -0.5 , -0.5 , -0.5 ,  0.0 , 1.0,
+    -0.5 , -0.5 ,  0.5 ,  0.0 , 0.0,
+    -0.5 ,  0.5 ,  0.5 ,  1.0 , 0.0,
+
+     0.5 ,  0.5 ,  0.5 ,  1.0 , 0.0,
+     0.5 ,  0.5 , -0.5 ,  1.0 , 1.0,
+     0.5 , -0.5 , -0.5 ,  0.0 , 1.0,
+     0.5 , -0.5 , -0.5 ,  0.0 , 1.0,
+     0.5 , -0.5 ,  0.5 ,  0.0 , 0.0,
+     0.5 ,  0.5 ,  0.5 ,  1.0 , 0.0,
+
+    -0.5 , -0.5 , -0.5 ,  0.0 , 1.0,
+     0.5 , -0.5 , -0.5 ,  1.0 , 1.0,
+     0.5 , -0.5 ,  0.5 ,  1.0 , 0.0,
+     0.5 , -0.5 ,  0.5 ,  1.0 , 0.0,
+    -0.5 , -0.5 ,  0.5 ,  0.0 , 0.0,
+    -0.5 , -0.5 , -0.5 ,  0.0 , 1.0,
+
+    -0.5 ,  0.5 , -0.5 ,  0.0 , 1.0,
+     0.5 ,  0.5 , -0.5 ,  1.0 , 1.0,
+     0.5 ,  0.5 ,  0.5 ,  1.0 , 0.0,
+     0.5 ,  0.5 ,  0.5 ,  1.0 , 0.0,
+    -0.5 ,  0.5 ,  0.5 ,  0.0 , 0.0,
+    -0.5 ,  0.5 , -0.5 ,  0.0 , 1.0,
+    // zig fmt: on
 };
 
 pub fn main() !void {
@@ -97,7 +131,7 @@ pub fn main() !void {
     gl.GenerateMipmap(gl.TEXTURE_2D);
     stbimg.stbi_image_free(data);
 
-    const data2 = stbimg.stbi_load("./src/textures/awesomeface.png", &tex_width, &tex_height, &tex_n_channels, 0);
+    const data2 = stbimg.stbi_load("./src/textures/dogsplusplus_logo.png", &tex_width, &tex_height, &tex_n_channels, 0);
     if (data2 == null) return error.FailedToLoadTexture;
     var tex1_id: gl.uint = undefined;
     gl.GenTextures(1, @ptrCast(&tex1_id));
@@ -114,41 +148,42 @@ pub fn main() !void {
 
     var vao: gl.uint = undefined;
     gl.GenVertexArrays(1, @ptrCast(&vao));
-    var vbo: gl.uint = undefined;
-    gl.GenBuffers(1, @ptrCast(&vbo));
-    var ebo: gl.uint = undefined;
-    gl.GenBuffers(1, @ptrCast(&ebo));
-
     gl.BindVertexArray(vao);
 
-    gl.BindBuffer(gl.ARRAY_BUFFER, vbo);
-    gl.BufferData(gl.ARRAY_BUFFER, @sizeOf(@TypeOf(vertices)), &vertices, gl.STATIC_DRAW);
+    var vbo: gl.uint = undefined;
+    gl.GenBuffers(1, @ptrCast(&vbo));
 
-    gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
-    gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, @sizeOf(@TypeOf(indices)), &indices, gl.STATIC_DRAW);
+    {
+        gl.BindBuffer(gl.ARRAY_BUFFER, vbo);
+        // pos
+        gl.BufferData(gl.ARRAY_BUFFER, @sizeOf(@TypeOf(vertices)), &vertices, gl.STATIC_DRAW);
+        gl.VertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 5 * @sizeOf(f32), 0);
+        gl.EnableVertexAttribArray(0);
+        // texcoord
+        gl.VertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, 5 * @sizeOf(f32), 3 * @sizeOf(f32));
+        gl.EnableVertexAttribArray(1);
+    }
 
-    gl.VertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, 8 * @sizeOf(f32), 0);
-    gl.EnableVertexAttribArray(0);
-    gl.VertexAttribPointer(1, 3, gl.FLOAT, gl.FALSE, 8 * @sizeOf(f32), 3 * @sizeOf(f32));
-    gl.EnableVertexAttribArray(1);
-    gl.VertexAttribPointer(2, 2, gl.FLOAT, gl.FALSE, 8 * @sizeOf(f32), 6 * @sizeOf(f32));
-    gl.EnableVertexAttribArray(2);
-
-    gl.BindBuffer(gl.ARRAY_BUFFER, 0);
-    gl.BindVertexArray(0);
+    {
+        gl.BindBuffer(gl.ARRAY_BUFFER, 0);
+        gl.BindVertexArray(0);
+    }
 
     const shader = try Shader.init(@embedFile("vert.glsl"), @embedFile("frag.glsl"));
     shader.activate();
     try shader.set(i32, "tex0", 0);
     try shader.set(i32, "tex1", 1);
 
+    gl.Enable(gl.DEPTH_TEST);
+
     // Wait for the user to close the window.
     while (!window.shouldClose()) {
         processInput(window);
 
-        gl.Clear(gl.COLOR_BUFFER_BIT);
+        gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        const model = za.Mat4.fromRotation(-55, za.Vec3.new(1.0, 0.0, 0.0));
+        const model = za.Mat4.fromRotation(@as(f32, @floatCast(glfw.getTime())) * 50.0, za.Vec3.new(0.5, 1.0, 0.0));
+        // const model = za.Mat4.fromRotation(-55, za.Vec3.new(1.0, 0.0, 0.0));
         // const model = za.Mat4.identity();
 
         const view = za.Mat4.fromTranslate(za.Vec3.new(0, 0, -3));
@@ -172,7 +207,7 @@ pub fn main() !void {
         gl.ActiveTexture(gl.TEXTURE1);
         gl.BindTexture(gl.TEXTURE_2D, tex1_id);
         gl.BindVertexArray(vao);
-        gl.DrawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
+        gl.DrawArrays(gl.TRIANGLES, 0, 36);
 
         window.swapBuffers();
         glfw.pollEvents();
