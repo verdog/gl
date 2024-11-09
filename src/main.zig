@@ -28,8 +28,8 @@ fn processInput(window: glfw.Window) void {
     }
 }
 
+// zig fmt: off
 const vertices = [_]f32{
-    // zig fmt: off
     // x    y      z      u     v
     -0.5 , -0.5 , -0.5 ,  0.0 , 0.0,
      0.5 , -0.5 , -0.5 ,  1.0 , 0.0,
@@ -72,8 +72,8 @@ const vertices = [_]f32{
      0.5 ,  0.5 ,  0.5 ,  1.0 , 0.0,
     -0.5 ,  0.5 ,  0.5 ,  0.0 , 0.0,
     -0.5 ,  0.5 , -0.5 ,  0.0 , 1.0,
-    // zig fmt: on
 };
+// zig fmt: on
 
 pub fn main() !void {
     glfw.setErrorCallback(errorCallback);
@@ -182,18 +182,11 @@ pub fn main() !void {
 
         gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        const model = za.Mat4.fromRotation(@as(f32, @floatCast(glfw.getTime())) * 50.0, za.Vec3.new(0.5, 1.0, 0.0));
-        // const model = za.Mat4.fromRotation(-55, za.Vec3.new(1.0, 0.0, 0.0));
-        // const model = za.Mat4.identity();
-
         const view = za.Mat4.fromTranslate(za.Vec3.new(0, 0, -3));
         // const view = za.Mat4.identity();
 
         const proj = za.Mat4.perspective(45, 800.0 / 600.0, 0.1, 100.0);
         // const proj = za.Mat4.identity();
-
-        const model_loc = gl.GetUniformLocation(shader.id, "model");
-        gl.UniformMatrix4fv(model_loc, 1, gl.FALSE, @ptrCast(&model.data));
 
         const view_loc = gl.GetUniformLocation(shader.id, "view");
         gl.UniformMatrix4fv(view_loc, 1, gl.FALSE, @ptrCast(&view.data));
@@ -207,7 +200,27 @@ pub fn main() !void {
         gl.ActiveTexture(gl.TEXTURE1);
         gl.BindTexture(gl.TEXTURE_2D, tex1_id);
         gl.BindVertexArray(vao);
-        gl.DrawArrays(gl.TRIANGLES, 0, 36);
+
+        const cube_positions = [_]za.Vec3{
+            za.Vec3.new(0.0, 0.0, 0.0),
+            za.Vec3.new(2.0, 5.0, -15.0),
+            za.Vec3.new(-1.5, -2.2, -2.5),
+            za.Vec3.new(-3.8, -2.0, -12.3),
+            za.Vec3.new(2.4, -0.4, -3.5),
+            za.Vec3.new(-1.7, 3.0, -7.5),
+            za.Vec3.new(1.3, -2.0, -2.5),
+            za.Vec3.new(1.5, 2.0, -2.5),
+            za.Vec3.new(1.5, 0.2, -1.5),
+            za.Vec3.new(-1.3, 1.0, -1.5),
+        };
+
+        for (cube_positions, 0..cube_positions.len) |pos, i| {
+            const model = za.Mat4.fromTranslate(pos)
+                .rotate(@as(f32, @floatCast(glfw.getTime() * 50)) + (20.0 * @as(f32, @floatFromInt(i))), za.Vec3.new(1.0, 0.3, 0.5));
+            const model_loc = gl.GetUniformLocation(shader.id, "model");
+            gl.UniformMatrix4fv(model_loc, 1, gl.FALSE, @ptrCast(&model.data));
+            gl.DrawArrays(gl.TRIANGLES, 0, 36);
+        }
 
         window.swapBuffers();
         glfw.pollEvents();
