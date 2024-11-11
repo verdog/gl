@@ -1678,8 +1678,8 @@ pub inline fn setInputMode(self: Window, mode: InputMode, value: anytype) void {
     const T = @TypeOf(value);
     std.debug.assert(switch (mode) {
         .cursor => switch (@typeInfo(T)) {
-            .Enum => T == InputModeCursor,
-            .EnumLiteral => @hasField(InputModeCursor, @tagName(value)),
+            .@"enum" => T == InputModeCursor,
+            .enum_literal => @hasField(InputModeCursor, @tagName(value)),
             else => false,
         },
         .sticky_keys => T == bool,
@@ -1688,8 +1688,8 @@ pub inline fn setInputMode(self: Window, mode: InputMode, value: anytype) void {
         .raw_mouse_motion => T == bool,
     });
     const int_value: c_int = switch (@typeInfo(T)) {
-        .Enum,
-        .EnumLiteral,
+        .@"enum",
+        .enum_literal,
         => @intFromEnum(@as(InputModeCursor, value)),
         else => @intFromBool(value),
     };

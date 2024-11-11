@@ -7,10 +7,58 @@ fn framebufferSizeCallback(_: glfw.Window, width: u32, height: u32) void {
     gl.Viewport(0, 0, @intCast(width), @intCast(height));
 }
 
+var first_mouse = true;
+
+fn mouse_callback(_: glfw.Window, xpos: f64, ypos: f64) void {
+    if (first_mouse) {
+        mouse_last_x = xpos;
+        mouse_last_y = ypos;
+        first_mouse = false;
+    }
+
+    const sensitivity = 0.1;
+    const x_offset = sensitivity * (xpos - mouse_last_x);
+    const y_offset = sensitivity * (mouse_last_y - ypos); // treating positive y as down
+    mouse_last_x = xpos;
+    mouse_last_y = ypos;
+
+    yaw += @floatCast(x_offset);
+    pitch += @floatCast(y_offset);
+    // if camera looks up, we get a "lookAt flip" which rotates the whole scene
+    // 180 degrees as we cross over from looking forward to looking backward
+    pitch = std.math.clamp(pitch, -89.9, 89.9);
+
+    camera_front = za.Vec3.new(
+        @cos(za.toRadians(yaw)) * @cos(za.toRadians(pitch)),
+        @sin(za.toRadians(pitch)),
+        @sin(za.toRadians(yaw)) * @cos(za.toRadians(pitch)),
+    ).norm();
+}
+
+fn scroll_callback(_: glfw.Window, xoff: f64, yoff: f64) void {
+    _ = xoff;
+    fov = std.math.clamp(fov - @as(f32, @floatCast(yoff)), 1, 90);
+}
+
 var gl_procs: gl.ProcTable = undefined;
 
 var polygons = false;
 var polygons_up = true;
+
+var camera_pos = za.Vec3.new(0, 0, 0);
+var camera_front = za.Vec3.new(0, 0, -1);
+var camera_up = za.Vec3.new(0, 1, 0);
+
+var pitch: f32 = 0;
+var yaw: f32 = -90;
+
+var delta_time: f64 = 0.0;
+var last_frame: f64 = 0.0;
+
+var mouse_last_x: f64 = 400;
+var mouse_last_y: f64 = 300;
+
+var fov: f32 = 45.0;
 
 fn processInput(window: glfw.Window) void {
     if (window.getKey(.escape) == .press) {
@@ -25,6 +73,23 @@ fn processInput(window: glfw.Window) void {
         }
     } else {
         polygons_up = true;
+    }
+
+    const cam_speed: f32 = @floatCast(5 * delta_time);
+
+    if (window.getKey(.w) == .press) {
+        camera_pos = camera_pos.add(camera_front.scale(cam_speed));
+    }
+    if (window.getKey(.s) == .press) {
+        camera_pos = camera_pos.sub(camera_front.scale(cam_speed));
+    }
+    if (window.getKey(.a) == .press) {
+        const dir = camera_front.cross(camera_up).norm().scale(cam_speed);
+        camera_pos = camera_pos.sub(dir);
+    }
+    if (window.getKey(.d) == .press) {
+        const dir = camera_front.cross(camera_up).norm().scale(cam_speed);
+        camera_pos = camera_pos.add(dir);
     }
 }
 
@@ -99,6 +164,9 @@ pub fn main() !void {
         };
 
         window.setFramebufferSizeCallback(framebufferSizeCallback);
+        window.setInputModeCursor(.disabled);
+        window.setCursorPosCallback(mouse_callback);
+        window.setScrollCallback(scroll_callback);
 
         break :blk window;
     };
@@ -178,27 +246,22 @@ pub fn main() !void {
 
     // Wait for the user to close the window.
     while (!window.shouldClose()) {
+        const current_frame = glfw.getTime();
+        delta_time = current_frame - last_frame;
+        last_frame = current_frame;
+
         processInput(window);
 
         gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        // const view = za.lookAt(
-        //     za.Vec3.new(0, 0, 3),
-        //     za.Vec3.new(0, 0, 0),
-        //     za.Vec3.new(0, 1, 0),
-        // );
+        const view = za.lookAt(
+            camera_pos,
+            camera_pos.add(camera_front),
+            camera_up,
+        );
         // const view = za.Mat4.identity();
 
-        const radius = 10.0;
-        const cam_x: f32 = @floatCast(@sin(glfw.getTime()) * radius);
-        const cam_z: f32 = @floatCast(@cos(glfw.getTime()) * radius);
-        const view = za.lookAt(
-            za.Vec3.new(cam_x, 0, cam_z),
-            za.Vec3.new(0, 0, 0),
-            za.Vec3.new(0, 1, 0),
-        );
-
-        const proj = za.Mat4.perspective(45, 800.0 / 600.0, 0.1, 100.0);
+        const proj = za.Mat4.perspective(fov, 800.0 / 600.0, 0.1, 100.0);
         // const proj = za.Mat4.identity();
 
         const view_loc = gl.GetUniformLocation(shader.id, "view");
