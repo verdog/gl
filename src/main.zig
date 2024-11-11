@@ -182,8 +182,21 @@ pub fn main() !void {
 
         gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        const view = za.Mat4.fromTranslate(za.Vec3.new(0, 0, -3));
+        // const view = za.lookAt(
+        //     za.Vec3.new(0, 0, 3),
+        //     za.Vec3.new(0, 0, 0),
+        //     za.Vec3.new(0, 1, 0),
+        // );
         // const view = za.Mat4.identity();
+
+        const radius = 10.0;
+        const cam_x: f32 = @floatCast(@sin(glfw.getTime()) * radius);
+        const cam_z: f32 = @floatCast(@cos(glfw.getTime()) * radius);
+        const view = za.lookAt(
+            za.Vec3.new(cam_x, 0, cam_z),
+            za.Vec3.new(0, 0, 0),
+            za.Vec3.new(0, 1, 0),
+        );
 
         const proj = za.Mat4.perspective(45, 800.0 / 600.0, 0.1, 100.0);
         // const proj = za.Mat4.identity();
